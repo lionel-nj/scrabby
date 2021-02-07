@@ -2,10 +2,26 @@ package org.scrabby.core
 
 import java.security.MessageDigest
 import java.util.*
+import java.util.concurrent.TimeUnit
 
-class Block(private val id: Int, private val prevHash: String) {
+class Block(private val id: Int, private val prevHash: String, val prefix: Int) {
     private val timestamp = Date().time
-    val hash: String = applySha256(id.toString() + prevHash + timestamp.toString())
+    var magicNumber = Random().nextLong();
+    var duration: Long = 0
+    var hash = mineBlock(prefix)
+
+    private fun mineBlock(prefix: Int): String {
+        var blockData = id.toString() + prevHash + timestamp.toString() + magicNumber.toString()
+        var now = System.nanoTime()
+        var newHash: String = applySha256(blockData)
+        val prefixString = String(CharArray(prefix)).replace('\u0000', '0')
+        while (newHash.substring(0, prefix) != prefixString) {
+            magicNumber += 1
+            newHash = applySha256(id.toString() + prevHash + timestamp.toString() + magicNumber.toString())
+        }
+        duration = System.nanoTime() - now
+        return newHash
+    }
 
     private fun applySha256(input: String): String {
         return try {
@@ -29,10 +45,14 @@ class Block(private val id: Int, private val prevHash: String) {
             "Block:\n" +
                     "Id: %d\n" +
                     "Timestamp: %s\n" +
+                    "Magic number: %x\n" +
                     "Hash of the previous block:\n" +
                     "%s\n" +
                     "Hash of the block:\n" +
-                    "%s", id, timestamp, prevHash, hash)
+                    "%s\n" +
+                    "Block was generating for %d milliseconds",
+            id, timestamp, magicNumber, prevHash, hash, TimeUnit.NANOSECONDS.toMillis(duration)
+        )
         println(toReturn)
     }
 }

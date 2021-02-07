@@ -1,6 +1,6 @@
 package org.scrabby.core
 
-class Blockchain(private val blockCount: Int) {
+class Blockchain(private val blockCount: Int, private val prefix: Int) {
     private val blocks: MutableList<Block> = mutableListOf()
 
     init {
@@ -8,9 +8,9 @@ class Blockchain(private val blockCount: Int) {
     }
 
     private fun generate() {
-        blocks.add(Block(1, "0"))
+        blocks.add(Block(1, "0", prefix))
         for (i in 1 until blockCount) {
-            blocks.add(Block(i + 1, blocks[i - 1].hash))
+            blocks.add(Block(i + 1, blocks[i - 1].hash, prefix))
         }
     }
 
