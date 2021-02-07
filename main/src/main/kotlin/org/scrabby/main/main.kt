@@ -1,5 +1,8 @@
 package org.scrabby.main
 
+import org.scrabby.core.Blockchain
+
 fun main(args: Array<String>) {
-    println("Hello world")
+    val blockchain = Blockchain(10)
+    blockchain.print(5)
 }
