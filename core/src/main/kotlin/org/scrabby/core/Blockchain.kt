@@ -1,6 +1,5 @@
 package org.scrabby.core
 
-
 class Blockchain(private val blockCount: Int) {
     private val blocks: MutableList<Block> = mutableListOf()
 
